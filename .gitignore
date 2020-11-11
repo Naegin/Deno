@@ -1,0 +1,4 @@
+
+config/__pycache__/data.cpython-38.pyc
+*.pyc
+json/config/.env
