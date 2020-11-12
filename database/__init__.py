@@ -1,1 +1,1 @@
-from .deno import Deno
+from .base import Database

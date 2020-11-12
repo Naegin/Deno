@@ -1,27 +1,36 @@
 from motor import motor_asyncio
-from .model import Guild
-import os, arrow
+from .model import User
+from datetime import datetime
+import os
 
 class Database:
-    def __init__(self, *, letty):
-        self.letty = letty
-        self.connection = motor_asyncio.AsyncIOMotorClient(os.environ['DB_URL'])
-        self.db = db = self.connection[os.environ['DB_NAME']]
-        self.guild = db.guilds
+    def __init__(self, *, deno):
+        self.deno = deno
+        self.connection = motor_asyncio.AsyncIOMotorClient(os.environ['D_URL'])
+        self.db = db = self.connection[os.environ['D_NAME']]
+        self.user = db.users
 
-    async def get_guild(self, guild_id):
-        data = await self.guild.find_one({"_id": guild_id})
+    async def get_user(self, ctx):
+        data = await self.user.find_one({"_id": ctx.id})
         if data != None:
-           return Guild(data, self.guild)
+           return User(data, self.user)
         else:
-          return await self.register_guild(guild_id)
+          return await self.reg_user(ctx)
 
-    async def register_user(self, ctx):
+    async def reg_user(self, ctx):
         data = {
-                "_id": ctx.author.id,
-
-                "premium":{"status":False, "time":arrow.now()},
-                "link":{"nike":[]}
+                "_id": ctx.id,
+                "premium":{
+                           "status":False, 
+                           "time":str(datetime.now()),
+                           "level":0
+                          },
+                "monitor":{
+                           "nike":{
+                                   "status":False,
+                                   "link":[]
+                                   }
+                           }
                 }
-        await self.guild.insert_one(data)
-        return Guild(data, self.guild)  
+        await self.user.insert_one(data)
+        return User(data, self.user)  
